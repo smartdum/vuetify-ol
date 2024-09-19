@@ -12,9 +12,15 @@ import { reactive, ref, onMounted } from "vue";
 import View from "ol/View";
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import GeoJSON from "ol/format/GeoJSON";
 import OSM from "ol/source/OSM";
 import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css"; // Uncomment this if you need to import OpenLayers styles
+import "ol-ext/dist/ol-ext.css";
+import LayerSwitcher from "ol-ext/control/LayerSwitcher";
+import LayerShop from "ol-ext/control/LayerShop";
 
 const mapRoot = ref<HTMLDivElement | null>(null); // Vue reference to the map DOM element
 
@@ -23,6 +29,17 @@ const map = new Map();
 const layers = [
   new TileLayer({
     source: new OSM(),
+    title: "OpenStreetMap",
+    basemap: true,
+    name: "OpenStreetMap",
+  }),
+  new VectorLayer({
+    source: new VectorSource({
+      url: "https://openlayers.org/data/vector/us-states.json",
+      format: new GeoJSON(),
+    }),
+    title: "US States",
+    name: "US States",
   }),
 ];
 map.setLayers(layers);
@@ -48,6 +65,9 @@ const zoomTo = (x: number, y: number) => {
   console.log(map.getView().getCenter());
 };
 
+const ctrlLayers = new LayerShop({ position: "topright" }, { layers: layers });
+map.addControl(ctrlLayers);
+
 onMounted(() => {
   if (mapRoot.value) {
     map.setTarget(mapRoot.value);
@@ -64,3 +84,8 @@ onMounted(() => {
   }
 });
 </script>
+<style>
+.ol-layerswitcher label {
+  color: black;
+}
+</style>
