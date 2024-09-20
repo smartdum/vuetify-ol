@@ -11,11 +11,14 @@
 import { reactive, ref, onMounted } from "vue";
 import View from "ol/View";
 import Map from "ol/Map";
+// Couches de fond (OSM)
 import TileLayer from "ol/layer/Tile";
+import OSM from "ol/source/OSM";
+// couches vectorielles
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
-import OSM from "ol/source/OSM";
+// methodes OL pour calcul
 import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css"; // Uncomment this if you need to import OpenLayers styles
 import "ol-ext/dist/ol-ext.css";
@@ -47,7 +50,8 @@ map.setLayers(layers);
 const view = new View({
   center: [0, 0],
   zoom: 2,
-  projection: "EPSG:900913",
+  projection: "EPSG:900913", // google Mercator [202589625,4587985214]
+  // projection: "EPSG:4326", // GPS [-2.2589,47.3698]
 });
 map.setView(view);
 
@@ -75,6 +79,7 @@ onMounted(() => {
     // Add event listener for pointer move (mouse movement)
     map.on("pointermove", (event) => {
       const coordinate = event.coordinate; // Get the coordinates in the map's projection
+      console.log(coordinate);
       const [lon, lat] = toLonLat(coordinate); // Convert to longitude/latitude
 
       // Update the reactive state
